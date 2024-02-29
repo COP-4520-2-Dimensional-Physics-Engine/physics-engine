@@ -1,8 +1,10 @@
 #include "visualizer.h"
+#include "PhysicsWorld.h"
 #include <raylib.h>
 
 static const int defaultWidth = 640;
 static const int defaultHeight = 480;
+static const int tickRate = 120;
 
 namespace visualizer {
 
@@ -17,8 +19,11 @@ void run() {
 	InitWindow(defaultWidth, defaultHeight, "Physics Visualizer");
 	SetTargetFPS(60);
 
+	PhysicsWorld *world = new PhysicsWorld();
+
 	while (!WindowShouldClose()) {
 		// step physics simulation
+		world->step(GetFrameTime(), 1.0 / tickRate);
 
 		// draw the state of the simulation
 		BeginDrawing();
