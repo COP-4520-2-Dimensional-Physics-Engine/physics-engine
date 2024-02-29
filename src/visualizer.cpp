@@ -1,6 +1,7 @@
 #include "visualizer.h"
 #include "PhysicsWorld.h"
 #include <raylib.h>
+#include <random>
 
 static const int defaultWidth = 640;
 static const int defaultHeight = 480;
@@ -8,10 +9,46 @@ static const int tickRate = 120;
 
 namespace visualizer {
 
+static PhysicsWorld *world;
+static std::vector<RigidBody *> renderBodies;
+static std::vector<Color> renderColors;
+
 static void render() {
 	ClearBackground(RAYWHITE);
 
-	DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+	double scale = 10;
+	vec2 offset;
+
+	for (size_t i = 0; i < renderBodies.size(); ++i) {
+		RigidBody *body = renderBodies[i];
+		vec2 position = body->position() * scale + offset
+			+ vec2(GetScreenWidth() / 2.0, GetScreenHeight() / 2.0);
+		double radius = body->radius() * scale;
+		DrawCircle(position.x, position.y, radius, renderColors[i]);
+	}
+}
+
+static void generateRandomStuff() {
+	std::random_device rdev;
+	std::mt19937 rng(rdev());
+
+	auto positionDistr = std::uniform_real_distribution(-100.0, 100.0);
+	auto sizeDistr = std::uniform_real_distribution(1.0, 10.0);
+	auto colorDistr = std::uniform_int_distribution<unsigned char>(0, 255);
+
+	for (int i = 0; i < 100; ++i) {
+		RigidBody *body = new RigidBody();
+		body->setPosition(vec2(positionDistr(rng), positionDistr(rng)));
+		body->setRadius(sizeDistr(rng));
+		world->add(body);
+		renderBodies.push_back(body);
+		renderColors.push_back(Color {
+			.r = colorDistr(rng),
+			.g = colorDistr(rng),
+			.b = colorDistr(rng),
+			.a = 255
+		});
+	}
 }
 
 void run() {
@@ -19,7 +56,9 @@ void run() {
 	InitWindow(defaultWidth, defaultHeight, "Physics Visualizer");
 	SetTargetFPS(60);
 
-	PhysicsWorld *world = new PhysicsWorld();
+	world = new PhysicsWorld();
+
+	generateRandomStuff();
 
 	while (!WindowShouldClose()) {
 		// step physics simulation
