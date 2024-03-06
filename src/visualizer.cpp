@@ -34,7 +34,7 @@ static void generateRandomStuff() {
 
 	auto positionDistr = std::uniform_real_distribution(-100.0, 100.0);
 	auto sizeDistr = std::uniform_real_distribution(1.0, 10.0);
-	auto colorDistr = std::uniform_int_distribution<unsigned char>(0, 255);
+	auto colorDistr = std::uniform_int_distribution<int>(0, 255);
 
 	for (int i = 0; i < 100; ++i) {
 		RigidBody *body = new RigidBody();
@@ -43,9 +43,9 @@ static void generateRandomStuff() {
 		world->add(body);
 		renderBodies.push_back(body);
 		renderColors.push_back(Color {
-			.r = colorDistr(rng),
-			.g = colorDistr(rng),
-			.b = colorDistr(rng),
+			.r = (unsigned char)colorDistr(rng),
+			.g = (unsigned char)colorDistr(rng),
+			.b = (unsigned char)colorDistr(rng),
 			.a = 255
 		});
 	}
