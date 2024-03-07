@@ -40,6 +40,10 @@ static void generateRandomStuff() {
 		RigidBody *body = new RigidBody();
 		body->setPosition(vec2(positionDistr(rng), positionDistr(rng)));
 		body->setRadius(sizeDistr(rng));
+
+		// for testing purposes
+		body->setAcceleration(vec2(0, 0.001));
+
 		world->add(body);
 		renderBodies.push_back(body);
 		renderColors.push_back(Color {
