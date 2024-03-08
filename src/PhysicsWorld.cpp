@@ -9,7 +9,9 @@ void PhysicsWorld::step(double dt) {
 	for (auto it = begin(bodies); it != end(bodies); it++) {
 		for (auto jt = next(it); jt != end(bodies); jt++) {
 			if ((*it)->collides(*jt)) {
-				// TODO: implement collision response
+				vec2 normal = ((*it)->position() - (*jt)->position()).unit();
+				(*it)->reflectPosition(normal);
+				(*jt)->reflectPosition(normal);
 			}
 		}
 	}

@@ -24,6 +24,10 @@ struct vec2 {
 		return std::sqrt(dot(*this));
 	}
 
+	vec2 unit() const {
+		return *this / vec2(length());
+	}
+
 	bool operator==(const vec2 &other) const {
 		return x == other.x && y == other.y;
 	}
