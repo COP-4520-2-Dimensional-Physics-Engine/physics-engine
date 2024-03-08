@@ -32,7 +32,7 @@ public:
 		return delta.length() < m_radius + other->m_radius;
 	}
 
-	void reflectPosition(const vec2 &normal) {
+	void reflectVelocity(const vec2 &normal) {
 		m_velocity = m_velocity - normal * 2 * normal.dot(m_velocity);
 	}
 

@@ -10,8 +10,12 @@ void PhysicsWorld::step(double dt) {
 		for (auto jt = next(it); jt != end(bodies); jt++) {
 			if ((*it)->collides(*jt)) {
 				vec2 normal = ((*it)->position() - (*jt)->position()).unit();
-				(*it)->reflectPosition(normal);
-				(*jt)->reflectPosition(normal);
+				(*it)->reflectVelocity(normal);
+				(*jt)->reflectVelocity(normal);
+
+				double overlap = (*it)->radius() + (*jt)->radius() - ((*it)->position() - (*jt)->position()).length();
+				(*it)->setPosition((*it)->position() + normal * overlap / 2);
+				(*jt)->setPosition((*jt)->position() - normal * overlap / 2);
 			}
 		}
 	}
