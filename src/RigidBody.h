@@ -27,4 +27,8 @@ public:
 	vec2 acceleration() const { return m_acceleration; }
 	void setAcceleration(vec2 value) { m_acceleration = value; }
 
+	bool collides(const RigidBody *other) const {
+		vec2 delta = m_position - other->m_position;
+		return delta.length() < m_radius + other->m_radius;
+	}
 };

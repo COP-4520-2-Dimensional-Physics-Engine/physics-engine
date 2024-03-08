@@ -21,7 +21,7 @@ static void render() {
 
 	for (size_t i = 0; i < renderBodies.size(); ++i) {
 		RigidBody *body = renderBodies[i];
-		vec2 position = body->position() * scale + offset
+		vec2 position = body->position() * scale * vec2(1, -1) + offset
 			+ vec2(GetScreenWidth() / 2.0, GetScreenHeight() / 2.0);
 		double radius = body->radius() * scale;
 		DrawCircle(position.x, position.y, radius, renderColors[i]);
