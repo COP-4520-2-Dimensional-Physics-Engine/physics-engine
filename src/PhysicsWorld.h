@@ -8,6 +8,8 @@ class PhysicsWorld {
 
 	std::vector<RigidBody *> bodies;
 
+	void positionIntegration(double dt);
+
 public:
 
 	void step(double dt);
