@@ -19,34 +19,28 @@ void PhysicsWorld::positionIntegration(double dt) {
 	threadPool.flush();
 }
 
-void PhysicsWorld::collisionDetectionAndResponse() {
+std::vector<std::array<RigidBody *, 2>> PhysicsWorld::collisionDetection() {
+	std::vector<std::array<RigidBody *, 2>> collisions;
 	for (auto it = begin(bodies); it != end(bodies); it++) {
-		auto start = next(it);
-		int chunkSize = std::distance(start, end(bodies)) / threadCount;
-
-		for (int i = 0; i < threadCount; i++) {
-			auto end = i < threadCount - 1 ? start + chunkSize : std::end(bodies);
-
-			threadPool.enqueue([it, start, end] {
-				for (auto jt = start; jt != end; jt++) {
-					if ((*it)->collides(*jt)) {
-
-						vec2 normal = ((*it)->position() - (*jt)->position()).unit();
-						(*it)->reflectVelocity(normal);
-						(*jt)->reflectVelocity(normal);
-
-						double overlap = (*it)->radius() + (*jt)->radius() - ((*it)->position() - (*jt)->position()).length();
-						(*it)->setPosition((*it)->position() + normal * overlap / 2);
-						(*jt)->setPosition((*jt)->position() - normal * overlap / 2);
-
-					}
-				}
-			});
-
-			start = end;
+		for (auto jt = next(it); jt != end(bodies); jt++) {
+			if ((*it)->collides(*jt)) {
+				collisions.push_back({*it, *jt});
+			}
 		}
+	}
 
-		threadPool.flush();
+	return collisions;
+}
+
+void PhysicsWorld::collisionResponse(std::vector<std::array<RigidBody *, 2>> &collisions) {
+	for (auto [a, b] : collisions) {
+		vec2 normal = (a->position() - b->position()).unit();
+		a->reflectVelocity(normal);
+		b->reflectVelocity(normal);
+
+		double overlap = a->radius() + b->radius() - (a->position() - b->position()).length();
+		a->setPosition(a->position() + normal * overlap / 2);
+		b->setPosition(b->position() - normal * overlap / 2);
 	}
 }
 
@@ -55,7 +49,9 @@ PhysicsWorld::PhysicsWorld() : threadPool(threadCount), lagAccumulator(0) {}
 void PhysicsWorld::step(double dt) {
 	positionIntegration(dt);
 
-	collisionDetectionAndResponse();
+  auto collisions = collisionDetection();
+
+	collisionResponse(collisions);
 }
 
 void PhysicsWorld::step(double dt, double fixedTimeStep) {
