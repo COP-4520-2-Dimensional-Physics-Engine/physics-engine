@@ -15,6 +15,8 @@ void PhysicsWorld::positionIntegration(double dt) {
 		threadPool.enqueue(integratePosition, std::ref(bodies), start, end, dt);
 		start = end;
 	}
+
+	threadPool.flush();
 }
 
 void PhysicsWorld::collisionDetectionAndResponse() {
@@ -43,6 +45,8 @@ void PhysicsWorld::collisionDetectionAndResponse() {
 
 			start = end;
 		}
+
+		threadPool.flush();
 	}
 }
 

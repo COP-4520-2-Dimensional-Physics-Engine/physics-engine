@@ -30,3 +30,10 @@ ThreadPool::~ThreadPool() {
     thread.join();
   }
 }
+
+void ThreadPool::flush() {
+  std::unique_lock<std::mutex> lock(queueMutex);
+  while (!tasks.empty()) {
+    tasks.pop();
+  }
+}

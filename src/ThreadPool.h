@@ -22,6 +22,8 @@ public:
     condition.notify_one();
   }
 
+  void flush();
+
 private:
   std::vector<std::thread> threads;
   std::queue<std::function<void()>> tasks;
