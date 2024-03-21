@@ -34,7 +34,45 @@ static void render() {
 	}
 }
 
+std::random_device rdev;
+std::mt19937 rng(rdev());
+
+static int placeFrame = -30;
+
 static void processInput() {
+	if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+		// place a body every 5 frames (1/12th of a second)
+		if (placeFrame == -30 || placeFrame >= 0 && placeFrame % 5 == 0) {
+			vec2 mouseScreen = vec2(GetMouseX(), GetMouseY());
+			vec2 halfScreen = vec2(GetScreenWidth() / 2.0, GetScreenHeight() / 2.0);
+			mouseScreen = mouseScreen - halfScreen;
+			vec2 mouseWorld = (mouseScreen - offset) * vec2(1, -1) / scale;
+
+			RigidBody *body = new RigidBody();
+			body->setPosition(mouseWorld);
+			body->setRadius(10);
+
+			// for testing purposes
+			body->setAcceleration(vec2(0, -196.2));
+
+			auto colorDistr = std::uniform_int_distribution<int>(0, 255);
+
+			world->add(body);
+			renderBodies.push_back(body);
+			renderColors.push_back(Color {
+				.r = (unsigned char)colorDistr(rng),
+				.g = (unsigned char)colorDistr(rng),
+				.b = (unsigned char)colorDistr(rng),
+				.a = 255
+			});
+		}
+
+		placeFrame += 1;
+	}
+	else {
+		placeFrame = -30;
+	}
+
 	Vector2 delta = GetMouseDelta();
 
 	if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
@@ -57,9 +95,6 @@ static void processInput() {
 }
 
 static void generateRandomStuff() {
-	std::random_device rdev;
-	std::mt19937 rng(rdev());
-
 	auto positionDistr = std::uniform_real_distribution(-100.0, 100.0);
 	auto sizeDistr = std::uniform_real_distribution(1.0, 10.0);
 	auto colorDistr = std::uniform_int_distribution<int>(0, 255);
@@ -70,7 +105,7 @@ static void generateRandomStuff() {
 		body->setRadius(sizeDistr(rng));
 
 		// for testing purposes
-		body->setAcceleration(vec2(0, 0.001));
+		body->setAcceleration(vec2(0, 0));
 
 		world->add(body);
 		renderBodies.push_back(body);
