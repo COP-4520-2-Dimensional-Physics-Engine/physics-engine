@@ -11,6 +11,7 @@ class PhysicsWorld {
 	std::vector<RigidBody *> bodies;
 
 	void positionIntegration(double dt);
+
 	void collisionDetectionAndResponse();
 
 public:
