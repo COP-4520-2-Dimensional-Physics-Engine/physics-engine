@@ -105,7 +105,7 @@ static void generateRandomStuff() {
 		body->setRadius(sizeDistr(rng));
 
 		// for testing purposes
-		body->setAcceleration(vec2(0, 0));
+		body->setAcceleration(vec2(0, 5));
 
 		world->add(body);
 		renderBodies.push_back(body);
