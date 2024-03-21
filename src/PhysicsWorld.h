@@ -1,10 +1,12 @@
 #pragma once
 #include <vector>
-#include <thread>
 #include "RigidBody.h"
+#include "ThreadPool.h"
 
 class PhysicsWorld {
-	const int numThreads = std::thread::hardware_concurrency();
+	const int threadCount = std::thread::hardware_concurrency();
+
+	ThreadPool threadPool;
 
 	double lagAccumulator;
 
@@ -15,6 +17,7 @@ class PhysicsWorld {
 	void collisionDetectionAndResponse();
 
 public:
+	PhysicsWorld();
 
 	void step(double dt);
 	void step(double dt, double fixedTimeStep);

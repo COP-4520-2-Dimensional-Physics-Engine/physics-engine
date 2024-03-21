@@ -1,9 +1,19 @@
 #include "PhysicsWorld.h"
 
+void integratePosition(std::vector<RigidBody *> &bodies, int start, int end, double dt) {
+	for (int i = start; i < end; i++) {
+		bodies[i]->setPosition(bodies[i]->position() + bodies[i]->velocity() * dt);
+		bodies[i]->setVelocity(bodies[i]->velocity() + bodies[i]->acceleration() * dt);
+	}
+}
+
 void PhysicsWorld::positionIntegration(double dt) {
-	for (auto body : bodies) {
-		body->setPosition(body->position() + body->velocity() * dt);
-		body->setVelocity(body->velocity() + body->acceleration() * dt);
+	int chunkSize = ssize(bodies) / threadCount;
+	int start = 0;
+	for (int i = 0; i < threadCount; i++) {
+		int end = i < threadCount - 1 ? start + chunkSize : ssize(bodies);
+		threadPool.enqueue(integratePosition, std::ref(bodies), start, end, dt);
+		start = end;
 	}
 }
 
@@ -22,6 +32,8 @@ void PhysicsWorld::collisionDetectionAndResponse() {
 		}
 	}
 }
+
+PhysicsWorld::PhysicsWorld() : threadPool(threadCount), lagAccumulator(0) {}
 
 void PhysicsWorld::step(double dt) {
 	positionIntegration(dt);
