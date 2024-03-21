@@ -30,13 +30,3 @@ ThreadPool::~ThreadPool() {
     thread.join();
   }
 }
-
-template <typename F, typename ...Args>
-void ThreadPool::enqueue(F&& f, Args&&...args) {
-  auto task = std::make_shared<std::function<void()>>(std::bind(std::forward<F>(f), std::forward<Args>(args)...));
-  {
-    std::unique_lock<std::mutex> lock(queueMutex);
-    tasks.push([task] { (*task)(); });
-  }
-  condition.notify_one();
-}
