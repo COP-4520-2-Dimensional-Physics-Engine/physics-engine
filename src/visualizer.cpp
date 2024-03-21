@@ -13,18 +13,46 @@ static PhysicsWorld *world;
 static std::vector<RigidBody *> renderBodies;
 static std::vector<Color> renderColors;
 
+double scale = 10;
+vec2 offset;
+
 static void render() {
 	ClearBackground(RAYWHITE);
-
-	double scale = 10;
-	vec2 offset;
 
 	for (size_t i = 0; i < renderBodies.size(); ++i) {
 		RigidBody *body = renderBodies[i];
 		vec2 position = body->position() * scale * vec2(1, -1) + offset
 			+ vec2(GetScreenWidth() / 2.0, GetScreenHeight() / 2.0);
 		double radius = body->radius() * scale;
+
+		// if there's no way we can see the body, don't even render it
+		if (position.x < -radius || position.y < -radius
+				|| position.x > GetScreenWidth() + radius || position.y > GetScreenHeight() + radius)
+			continue;
+
 		DrawCircle(position.x, position.y, radius, renderColors[i]);
+	}
+}
+
+static void processInput() {
+	Vector2 delta = GetMouseDelta();
+
+	if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE) || IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+		offset = offset + vec2(delta.x, delta.y);
+	}
+
+	Vector2 wheel = GetMouseWheelMoveV();
+
+	double newScale = scale * pow(1.2, wheel.y);
+	if (newScale != scale) {
+
+		// when we zoom out, we want to preserve the world space location of the mouse cursor
+		vec2 mouseScreen = vec2(GetMouseX(), GetMouseY());
+		vec2 halfScreen = vec2(GetScreenWidth() / 2.0, GetScreenHeight() / 2.0);
+		mouseScreen = mouseScreen - halfScreen;
+		offset = mouseScreen - (mouseScreen - offset) * newScale / scale;
+
+		scale = newScale;
 	}
 }
 
@@ -67,6 +95,9 @@ void run() {
 	while (!WindowShouldClose()) {
 		// step physics simulation
 		world->step(GetFrameTime(), 1.0 / tickRate);
+
+		// process input
+		processInput();
 
 		// draw the state of the simulation
 		BeginDrawing();
