@@ -21,13 +21,30 @@ void PhysicsWorld::positionIntegration(double dt) {
 
 std::vector<std::array<RigidBody *, 2>> PhysicsWorld::collisionDetection() {
 	std::vector<std::array<RigidBody *, 2>> collisions;
-	for (auto it = begin(bodies); it != end(bodies); it++) {
-		for (auto jt = next(it); jt != end(bodies); jt++) {
-			if ((*it)->collides(*jt)) {
-				collisions.push_back({*it, *jt});
-			}
+
+	std::mutex collisionsMutex;
+
+	for (int i = 0; i < ssize(bodies); i++) {
+
+		for (int j = i + 1; j < ssize(bodies); j++) {
+
+			threadPool.enqueue([&] {
+
+				if ((bodies[i]->collides(bodies[j]))) {
+
+					std::lock_guard<std::mutex> lock(collisionsMutex);
+
+					collisions.push_back({bodies[i], bodies[j]});
+
+				}
+
+			});
+
 		}
+
 	}
+
+	threadPool.flush();
 
 	return collisions;
 }

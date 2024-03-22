@@ -33,7 +33,7 @@ ThreadPool::~ThreadPool() {
 
 void ThreadPool::flush() {
   std::unique_lock<std::mutex> lock(queueMutex);
-  while (!tasks.empty()) {
+  while (!empty(tasks)) {
     tasks.pop();
   }
 }
