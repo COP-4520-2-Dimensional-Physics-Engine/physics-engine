@@ -14,7 +14,9 @@ class PhysicsWorld {
 
 	void positionIntegration(double dt);
 
-	void collisionDetectionAndResponse();
+	std::vector<std::array<RigidBody *, 2>> collisionDetection();
+
+	void collisionResponse(std::vector<std::array<RigidBody *, 2>> &collisions);
 
 public:
 	PhysicsWorld();

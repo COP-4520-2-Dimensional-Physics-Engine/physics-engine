@@ -30,3 +30,8 @@ ThreadPool::~ThreadPool() {
     thread.join();
   }
 }
+
+void ThreadPool::wait() {
+  std::unique_lock<std::mutex> lock(queueMutex);
+  waitCondition.wait(lock, [this] { return queuedTasks == 0; });
+}
