@@ -99,7 +99,7 @@ static void generateRandomStuff() {
 	auto sizeDistr = std::uniform_real_distribution(1.0, 10.0);
 	auto colorDistr = std::uniform_int_distribution<int>(0, 255);
 
-	for (int i = 0; i < 100; ++i) {
+	for (int i = 0; i < 1000; ++i) {
 		RigidBody *body = new RigidBody();
 		body->setPosition(vec2(positionDistr(rng), positionDistr(rng)));
 		body->setRadius(sizeDistr(rng));

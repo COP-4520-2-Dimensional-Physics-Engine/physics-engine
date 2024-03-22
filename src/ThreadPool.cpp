@@ -31,9 +31,7 @@ ThreadPool::~ThreadPool() {
   }
 }
 
-void ThreadPool::flush() {
+void ThreadPool::wait() {
   std::unique_lock<std::mutex> lock(queueMutex);
-  while (!tasks.empty()) {
-    tasks.pop();
-  }
+  waitCondition.wait(lock, [this] { return queuedTasks == 0; });
 }
